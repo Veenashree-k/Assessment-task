@@ -36,7 +36,7 @@ function setCategory(cat: string) {
       <div class="max-w-6xl mx-auto px-4 text-center mb-12">
         <h2 class="text-4xl font-semibold">Portfolio</h2>
         <div class="w-20 h-1 bg-teal-500 mx-auto mt-2 mb-4"></div>
-        <p class="text-sm text-gray-600 mt-2">Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <p class="text-xs text-gray-600 mt-2">Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
       </div>
 
       <!-- Filters -->

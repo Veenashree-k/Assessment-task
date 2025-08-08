@@ -101,8 +101,8 @@
   <section id="skills" class="py-16 bg-gray-50">
     <div class="max-w-6xl mx-auto px-4" data-aos="fade-up">
       <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-800">Skills</h2>
-        <p class="text-gray-600 mt-2 max-w-xl mx-auto">
+        <h2 class="text-4xl font-semibold text-gray-800">Skills</h2>
+        <p class="text-xs text-gray-600 mt-2 max-w-xl mx-auto">
           Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
         </p>
       </div>
@@ -121,9 +121,9 @@
   <section id="facts" class="py-16 bg-white">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-12" data-aos="fade-up">
-        <h2 class="text-4xl font-bold text-gray-800 mb-2">Facts</h2>
+        <h2 class="text-4xl font-semibold text-gray-800 mb-2">Facts</h2>
         <div class="w-20 h-1 bg-teal-500 mx-auto mb-4"></div>
-        <p class="text-gray-600 max-w-xl mx-auto">Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+        <p class="text-xs text-gray-600 max-w-xl mx-auto">Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
       </div>
       <div
         class="grid grid-cols-2 md:grid-cols-4 gap-10 text-center"

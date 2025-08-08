@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Open Sans"', 'sans-serif'],
+        sans: ['"Poppins"', 'sans-serif'],
         body: ['"Open Sans"', 'sans-serif'],
         heading: ['"Raleway"', 'sans-serif'],
       },

@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto px-4">
       <h2 class="text-center text-4xl font-semibold">Contact</h2>
       <div class="w-20 h-1 bg-teal-500 mx-auto mt-2 mb-4"></div>
-      <p class="text-center mb-12 text-gray-600 text-sm">
+      <p class="text-center mb-12 text-gray-600 text-xs">
         Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
       </p>
 

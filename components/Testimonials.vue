@@ -48,8 +48,8 @@ const testimonials = ref([
 <template>
   <section id="testimonials" class="py-16 bg-white">
     <div class="text-center mb-12" data-aos="fade-up">
-      <h2 class="text-3xl font-bold mb-2">Testimonials</h2>
-      <p class="text-gray-600 max-w-xl mx-auto text-sm px-4 sm:px-0">
+      <h2 class="text-3xl font-semibold mb-2">Testimonials</h2>
+      <p class="text-gray-600 max-w-xl mx-auto text-xs px-4 sm:px-0">
         Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
       </p>
     </div>
@@ -59,7 +59,7 @@ const testimonials = ref([
       :loop="true"
       :speed="600"
       :autoplay="{ delay: 2500, disableOnInteraction: false }"
-      :pagination="{ clickable: true }"
+      :pagination="{ clickable: true, el: '.testimonial-pagination' }"
       :slides-per-view="1"
       :centered-slides="true"
       class="mx-auto max-w-full sm:max-w-lg md:max-w-xl lg:max-w-3xl"
@@ -67,7 +67,7 @@ const testimonials = ref([
       <SwiperSlide
         v-for="(testimonial, index) in testimonials"
         :key="index"
-        class="text-center px-6 text-sm sm:text-base lg:text-lg"
+        class="text-center px-6"
       >
         <img
           :src="testimonial.img"
@@ -76,7 +76,7 @@ const testimonials = ref([
         />
 
         <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ testimonial.name }}</h3>
-        <p class="text-gray-500 text-sm mb-3">{{ testimonial.title }}</p>
+        <p class="text-gray-500 text-xs mb-3">{{ testimonial.title }}</p>
 
         <div class="flex justify-center space-x-1 text-yellow-400 mb-4">
           <i
@@ -88,7 +88,8 @@ const testimonials = ref([
         </div>
 
         <p
-          class="italic text-gray-700 leading-relaxed px-4 max-w-full mx-auto text-[11px] sm:text-sm lg:text-base"
+          class="italic text-gray-700 leading-relaxed px-4 max-w-full mx-auto 
+                 text-[11px] sm:text-sm md:text-base lg:text-base"
         >
           <span class="text-teal-400 text-2xl font-bold mr-2 align-top mb-2">“</span>
           {{ testimonial.text }}
@@ -96,6 +97,9 @@ const testimonials = ref([
         </p>
       </SwiperSlide>
     </Swiper>
+
+    <!-- ✅ Pagination container placed below Swiper -->
+    <div class="testimonial-pagination mt-6 flex justify-center"></div>
   </section>
 </template>
 

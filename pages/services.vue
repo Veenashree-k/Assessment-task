@@ -5,7 +5,7 @@
       <div class="text-center mb-12">
         <h2 class="text-4xl font-semibold text-gray-800">Services</h2>
         <div class="w-20 h-1 bg-teal-500 mx-auto mt-2 mb-4"></div>
-        <p class="text-sm text-gray-600 mt-2">
+        <p class="text-xs text-gray-600 mt-2">
           Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
         </p>
       </div>
@@ -13,12 +13,12 @@
       <!-- Services Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="(service, index) in services"
-          :key="index"
-          tabindex="0"
-          class="group bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 text-center focus:outline-none focus:ring-4 focus:ring-teal-300"
-          style="width: 342px; height: 367.4px;"
-        >
+         v-for="(service, index) in services"
+        :key="index"
+         tabindex="0"
+         class="group w-full h-auto sm:w-[342px] sm:h-[367.4px] bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 text-center focus:outline-none focus:ring-4 focus:ring-teal-300"
+>
+
           <article>
             <!-- Icon inside rounded background -->
             <div

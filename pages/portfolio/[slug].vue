@@ -6,52 +6,25 @@
       data-aos="fade-up"
     >
       <!-- Title -->
-      <h2
-        class="text-4xl text-center font-semibold"
-        data-aos="fade-down"
-      >
+      <h2 class="text-4xl text-center font-semibold" data-aos="fade-down">
         Portfolio Details
       </h2>
-      <div
-        class="w-20 h-1 bg-teal-500 mx-auto mt-2 mb-4"
-        data-aos="fade-down"
-      ></div>
-      <p
-        class="text-center text-sm text-gray-500 mb-8"
-        data-aos="fade-down"
-      >
-        Necessitatibus eius consequatur ex aliquid fuga eum quidem sint
-        consectetur velit
+      <div class="w-20 h-1 bg-teal-500 mx-auto mt-2 mb-4" data-aos="fade-down"></div>
+      <p class="text-center text-xs text-gray-500 mb-8" data-aos="fade-down">
+        Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
       </p>
 
       <!-- Two-column layout -->
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start"
-      >
-        <!-- Left Column: Project Info + Description -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+        <!-- Left Column -->
         <div data-aos="fade-right">
           <!-- Project Info -->
-          <div
-            class="bg-white p-6 rounded shadow mb-8"
-          >
-            <h4
-              class="text-xl font-semibold mb-4"
-            >
-              Project Information
-            </h4>
+          <div class="bg-white p-6 rounded shadow mb-8">
+            <h4 class="text-xl font-semibold mb-4">Project Information</h4>
             <ul class="text-gray-700 text-sm space-y-2">
-              <li>
-                <strong>Category:</strong>
-                {{ portfolioItem.categoryName }}
-              </li>
-              <li>
-                <strong>Client:</strong>
-                {{ portfolioItem.client }}
-              </li>
-              <li>
-                <strong>Project date:</strong>
-                {{ portfolioItem.date }}
-              </li>
+              <li><strong>Category:</strong> {{ portfolioItem.categoryName }}</li>
+              <li><strong>Client:</strong> {{ portfolioItem.client }}</li>
+              <li><strong>Project date:</strong> {{ portfolioItem.date }}</li>
               <li>
                 <strong>Project URL:</strong>
                 <a
@@ -68,23 +41,21 @@
 
           <!-- Description -->
           <div>
-            <h4 class="text-lg font-semibold mb-2">
-              Description
-            </h4>
+            <h4 class="text-lg font-semibold mb-2">Description</h4>
             <p class="text-gray-600">
               {{ portfolioItem.description }}
             </p>
           </div>
         </div>
 
-        <!-- Right Column: Swiper Images -->
+        <!-- Right Column: Swiper -->
         <div data-aos="fade-left">
           <Swiper
             :modules="[Autoplay, Pagination]"
             :autoplay="{ delay: 3000, disableOnInteraction: false }"
             :loop="true"
             :slides-per-view="1"
-            :pagination="{ clickable: true }"
+            :pagination="{ clickable: true, el: '.portfolio-pagination' }"
             class="rounded-lg shadow-lg w-full h-[400px] sm:h-[500px] md:h-[565px]"
           >
             <SwiperSlide
@@ -98,33 +69,23 @@
               />
             </SwiperSlide>
           </Swiper>
+
+          <!-- Custom Pagination -->
+          <div class="portfolio-pagination mt-4 flex justify-center"></div>
         </div>
       </div>
     </section>
 
-    <!-- Fallback if item not found -->
-    <div
-      v-else
-      class="text-center py-20"
-    >
-      <h2
-        class="text-2xl font-semibold text-red-600"
-      >
-        Portfolio item not found
-      </h2>
-      <p
-        class="text-gray-500 mt-4"
-      >
-        <NuxtLink
-          to="/portfolio"
-          class="text-blue-500 underline"
-        >
-          ← Back to Portfolio
-        </NuxtLink>
+    <!-- Fallback -->
+    <div v-else class="text-center py-20">
+      <h2 class="text-2xl font-semibold text-red-600">Portfolio item not found</h2>
+      <p class="text-gray-500 mt-4">
+        <NuxtLink to="/portfolio" class="text-blue-500 underline">← Back to Portfolio</NuxtLink>
       </p>
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
@@ -271,3 +232,19 @@ const portfolioItem = computed(() =>
   portfolioItems.find((item) => item.slug === route.params.slug)
 )
 </script>
+
+<style scoped>
+.portfolio-pagination .swiper-pagination-bullet {
+  background-color: #d1d5db;
+  opacity: 0.6;
+  margin: 0 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+}
+
+.portfolio-pagination .swiper-pagination-bullet-active {
+  background-color: #14b8a6; /* teal-500 */
+  opacity: 1;
+}
+</style>
