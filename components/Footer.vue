@@ -1,3 +1,7 @@
+<script setup>
+const { data: pages } = await useFetch('https://localhost:7102/api/Data/pages')
+</script>
+
 <template>
   <footer class="bg-stone-200 text-gray-700 text-sm py-10 text-center border-t-0">
 
@@ -30,10 +34,6 @@
     </p>
   </footer>
 </template>
-
-<script setup>
-// No script needed
-</script>
 
 <style scoped>
 /* Optional: add smooth hover transitions or custom tweaks */

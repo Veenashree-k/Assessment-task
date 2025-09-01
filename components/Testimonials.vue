@@ -6,6 +6,14 @@ import { Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
+interface Testimonial {
+  img: string
+  name: string
+  title: string
+  stars: number
+  text: string
+}
+
 const testimonials = ref([
   {
     img: '/images/testimonials-1.jpg',

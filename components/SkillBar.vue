@@ -1,3 +1,14 @@
+<script setup>
+defineProps({
+  label: String,
+  value: {
+    type: Number,
+    required: true,
+    validator: v => v >= 0 && v <= 100
+  }
+})
+</script>
+
 <template>
   <div>
     <div class="flex justify-between text-sm font-medium text-gray-700 mb-1">
@@ -10,13 +21,4 @@
   </div>
 </template>
 
-<script setup>
-defineProps({
-  label: String,
-  value: {
-    type: Number,
-    required: true,
-    validator: v => v >= 0 && v <= 100
-  }
-})
-</script>
+

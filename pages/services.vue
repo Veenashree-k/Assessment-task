@@ -1,3 +1,74 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import LoadingBlock from '~/components/LoadingBlock.vue'
+import { serviceCall } from '~/utils/serviceCall'
+import { apiEndpoints } from '~/utils/apiEndpoints'
+
+interface Service {
+  id: number
+  iconClass?: string
+  icon: string
+  title: string
+  description: string
+  iconColor: string
+  iconBgHover: string
+}
+
+// Map of all 6 icon classes to their colors and hover bg
+const colorMap: Record<string, { iconColor: string; iconBgHover: string }> = {
+  'bi bi-activity': {
+    iconColor: 'text-red-500',
+    iconBgHover: 'group-hover:bg-red-500',
+  },
+  'bi bi-broadcast': {
+    iconColor: 'text-blue-500',
+    iconBgHover: 'group-hover:bg-blue-500',
+  },
+  'bi bi-bag-check': {
+    iconColor: 'text-green-500',
+    iconBgHover: 'group-hover:bg-green-500',
+  },
+  'bi bi-diagram-3': {
+    iconColor: 'text-yellow-500',
+    iconBgHover: 'group-hover:bg-yellow-500',
+  },
+  'bi bi-clipboard': {
+    iconColor: 'text-purple-500',
+    iconBgHover: 'group-hover:bg-purple-500',
+  },
+  'bi bi-chat-dots': {
+    iconColor: 'text-pink-500',
+    iconBgHover: 'group-hover:bg-pink-500',
+  },
+}
+
+// state
+const services = ref<Service[]>([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const data = await serviceCall<Service[]>({
+        endpoint: apiEndpoints.data.services.endpoint,
+        method: apiEndpoints.data.services.method
+    })
+    services.value = data.map(item => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      icon: item.iconClass || 'bi bi-question-circle', 
+      iconColor: colorMap[item.iconClass ?? '']?.iconColor || 'text-teal-500', 
+      iconBgHover: colorMap[item.iconClass ?? '']?.iconBgHover || 'group-hover:bg-teal-500',
+    }))
+  } catch (err) {
+    console.error('Services API error:', err)
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
+
 <template>
   <section id="services" class="py-16 bg-white" data-aos="zoom-in-down">
     <div class="max-w-6xl mx-auto px-4">
@@ -10,15 +81,19 @@
         </p>
       </div>
 
-      <!-- Services Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div
-         v-for="(service, index) in services"
-        :key="index"
-         tabindex="0"
-         class="group w-full h-auto sm:w-[342px] sm:h-[367.4px] bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 text-center focus:outline-none focus:ring-4 focus:ring-teal-300"
->
+      <!-- Loading -->
+      <div v-if="loading" class="text-center py-10">
+        <p class="text-gray-500">Loading services...</p>
+      </div>
 
+      <!-- Services Grid -->
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          v-for="service in services"
+          :key="service.id"
+          tabindex="0"
+          class="group w-full h-auto sm:w-[342px] sm:h-[367.4px] bg-white p-6 rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition duration-300 text-center focus:outline-none focus:ring-4 focus:ring-teal-300"
+        >
           <article>
             <!-- Icon inside rounded background -->
             <div
@@ -40,59 +115,6 @@
     </div>
   </section>
 </template>
-
-<script setup lang="ts">
-const services = [
-  {
-    icon: 'bx bx-pulse',
-    title: 'Nesciunt Mete',
-    description:
-      'Provident nihil minus qui consequatur non omnis maiores. Eos accusantium minus dolores iure perferendis tempore et consequatur.',
-    iconColor: 'text-teal-500',
-    iconBgHover: 'group-hover:bg-teal-500',
-  },
-  {
-    icon: 'bx bx-broadcast',
-    title: 'Eosle Commodi',
-    description:
-      'Ut autem aut autem non a. Sint sint sit facilis nam iusto sint. Libero corrupti neque eum hic non ut nesciunt dolorem.',
-    iconColor: 'text-orange-500',
-    iconBgHover: 'group-hover:bg-orange-500',
-  },
-  {
-    icon: 'bx bx-tv',
-    title: 'Ledo Markt',
-    description:
-      'Ut excepturi voluptatem nisi sed. Quidem fuga consequatur. Minus ea aut. Vel qui id voluptas adipisci eos earum corrupti.',
-    iconColor: 'text-green-500',
-    iconBgHover: 'group-hover:bg-green-500',
-  },
-  {
-    icon: 'bx bx-vector',
-    title: 'Asperiores Commodit',
-    description:
-      'Non et temporibus minus omnis sed dolor esse consequatur. Cupiditate sed error ea fuga sit provident adipisci neque.',
-    iconColor: 'text-red-500',
-    iconBgHover: 'group-hover:bg-red-500',
-  },
-  {
-    icon: 'bx bx-devices',
-    title: 'Velit Doloremque',
-    description:
-      'Cumque et suscipit saepe. Est maiores autem enim facilis ut aut ipsam corporis aut. Sed animi at autem alias eius labore.',
-    iconColor: 'text-purple-500',
-    iconBgHover: 'group-hover:bg-purple-500',
-  },
-  {
-    icon: 'bx bx-chat',
-    title: 'Dolori Architecto',
-    description:
-      'Hic molestias ea quibusdam eos. Fugiat enim doloremque aut neque non et debitis iure. Corrupti recusandae ducimus enim.',
-    iconColor: 'text-pink-500',
-    iconBgHover: 'group-hover:bg-pink-500',
-  },
-]
-</script>
 
 <style scoped>
 .group:hover {

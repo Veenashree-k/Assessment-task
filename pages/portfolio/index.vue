@@ -1,34 +1,57 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { usePortfolio } from '~/composables/usePortfolio'
+import LoadingBlock from '~/components/LoadingBlock.vue'
+import { serviceCall } from '~/utils/serviceCall'
+import { apiEndpoints } from '~/utils/apiEndpoints'
 
-usePortfolio()
-
-const items = [
-  { image: '/images/masonry-portfolio-1.jpg', title: 'App 1', subtitle: 'App design', category: 'filter-app', slug: 'app-1' },
-  { image: '/images/masonry-portfolio-2.jpg', title: 'Product 1', subtitle: 'Product card', category: 'filter-product', slug: 'product-1' },
-  { image: '/images/masonry-portfolio-3.jpg', title: 'Branding 1', subtitle: 'Brand identity', category: 'filter-branding', slug: 'branding-1' },
-  { image: '/images/masonry-portfolio-6.jpg', title: 'Branding 2', subtitle: 'Brand identity', category: 'filter-branding', slug: 'branding-2' },
-  { image: '/images/masonry-portfolio-5.jpg', title: 'Product 2', subtitle: 'Product card', category: 'filter-product', slug: 'product-2' },
-  { image: '/images/masonry-portfolio-4.jpg', title: 'App 2', subtitle: 'App design', category: 'filter-app', slug: 'app-2' },
-  { image: '/images/masonry-portfolio-7.jpg', title: 'Branding 3', subtitle: 'Brand identity', category: 'filter-branding', slug: 'branding-3' },
-  { image: '/images/masonry-portfolio-8.jpg', title: 'App 3', subtitle: 'App design', category: 'filter-app', slug: 'app-3' },
-  { image: '/images/masonry-portfolio-9.jpg', title: 'Product 3', subtitle: 'Product card', category: 'filter-product', slug: 'product-3' },
-]
-
+const items = ref<any[]>([])
 const activeCategory = ref('*')
+const loading = ref(true)
 
 const filteredItems = computed(() => {
-  if (activeCategory.value === '*'){
-    return items
-  } 
-  return items.filter(item => item.category === activeCategory.value)
+  if (activeCategory.value === '*') return items.value
+  return items.value.filter(item => item.category === activeCategory.value)
 })
 
 function setCategory(cat: string) {
   activeCategory.value = cat
 }
+
+async function fetchPortfolioItems() {
+  try {
+    const data = await serviceCall<any[]>({
+        endpoint: apiEndpoints.data.products.endpoint,
+        method: apiEndpoints.data.products.method || 'GET'
+    })
+    items.value = data.map(item => ({
+      id: item.id,
+      image: item.imageUrl,
+      title: item.title,
+      subtitle: item.shortDescription || item.categoryName,
+      category: `filter-${item.categoryName.toLowerCase().replace(/\s+/g, '-')}`,
+      slug: item.slug,
+    }))
+
+    usePortfolio()
+
+  } catch (err) {
+    console.error('Failed to load portfolio items:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+function onClickLogic(value: boolean = false){
+    console.log("click happening Properly", value);
+}
+
+onMounted(() => {
+  fetchPortfolioItems()
+})
 </script>
+
+
 
 <template>
   <main class="portfolio-page">
@@ -94,6 +117,7 @@ function setCategory(cat: string) {
 
       <!-- Portfolio Grid -->
       <div class="columns-1 sm:columns-2 lg:columns-3 gap-6">
+        <!-- <P v-for="(item, index) in items">{{ item.title ?? "-" }}</P> -->
         <div
           v-for="(item, index) in filteredItems"
           :key="item.slug"
@@ -101,8 +125,9 @@ function setCategory(cat: string) {
           data-aos="fade-up"
           :data-aos-delay="index * 100"
         >
+        
           <img
-            :src="item.image"
+            :src="item.image.replace('C:/Users/Veena.S/Desktop/Kelly/kelly_project/public', '')"
             :alt="item.title"
             class="w-full h-auto object-cover"
             loading="lazy"
@@ -125,7 +150,7 @@ function setCategory(cat: string) {
                 <i class="bi bi-plus-circle text-xl"></i>
               </a>
               <NuxtLink
-                :to="`/portfolio/${item.slug}`"
+                :to="`/portfolio/${item.id}`"
                 class="text-gray-700 hover:text-primary"
                 :aria-label="`View details of ${item.title}`"
               >
@@ -142,6 +167,11 @@ function setCategory(cat: string) {
 <style scoped>
 .portfolio-page {
   scroll-behavior: smooth;
+}
+
+.img{
+    width: 300px;
+    height: 200px;
 }
 
 /* Optional smoother hover effect on overlay */

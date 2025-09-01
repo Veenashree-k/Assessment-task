@@ -1,3 +1,78 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay, Pagination } from 'swiper/modules'
+import { serviceCall } from '~/utils/serviceCall'
+import { apiEndpoints } from '~/utils/apiEndpoints'
+
+import 'swiper/css'
+import 'swiper/css/pagination'
+
+const route = useRoute()
+const portfolioItem = ref<any>(null)
+const isLoading = ref(true)
+
+// Leave this untouched (image path cleaner)
+function formatImageUrl(path: string): string {
+  return path
+    .replace(/\\/g, '/')
+    .split('/public')[1] || ''
+}
+
+async function fetchPortfolioItem(slug: string) {
+  isLoading.value = true
+  try {
+    const endpoint = `${apiEndpoints.data.products.endpoint}/${slug}`
+
+    const data = await serviceCall<any>({
+      endpoint,
+      method: apiEndpoints.data.products.method || 'GET',
+    })
+    
+    const raw = data.result || data;
+    console.log("Raw API Response:", raw);
+
+    if (!raw.productImages || raw.productImages.length === 0) {
+      raw.productImages = [
+        { imageUrl: 'C:/Users/Veena.S/Desktop/Kelly/kelly_project/public/images/app-1.jpg' },
+        { imageUrl: 'C:/Users/Veena.S/Desktop/Kelly/kelly_project/public/images/books-1.jpg' },
+        { imageUrl: 'C:/Users/Veena.S/Desktop/Kelly/kelly_project/public/images/branding-1.jpg' },
+      ];
+    }
+
+    if (raw.imageUrl) {
+      raw.productImages.push({ imageUrl: raw.imageUrl });
+    }
+
+       portfolioItem.value = {
+      ...raw,
+      categoryName: raw.categoryName || 'N/A',
+      client: raw.clientName || 'N/A',
+      date: raw.projectDate
+        ? new Date(raw.projectDate).toLocaleDateString()
+        : 'N/A',
+      url: raw.projectUrl || 'N/A',
+      description: raw.description || 'No description available',
+      images: (raw.productImages || []).map((img: any) =>
+        formatImageUrl(img.imageUrl)
+      ),
+    };
+
+    console.log("Mapped project Item:", portfolioItem.value);
+
+  } catch (err) {
+    console.error('Failed to load portfolio item:', err);
+  }
+}
+
+onMounted(() => {
+  const slug = route.params.slug as string;
+  console.log("Route slug:", slug);
+  fetchPortfolioItem(slug);
+});
+</script>
+
 <template>
   <div>
     <section
@@ -19,25 +94,29 @@
         <!-- Left Column -->
         <div data-aos="fade-right">
           <!-- Project Info -->
-          <div class="bg-white p-6 rounded shadow mb-8">
-            <h4 class="text-xl font-semibold mb-4">Project Information</h4>
+      
+      <div class="bg-white p-6 rounded shadow mb-8">
+         <h4 class="text-xl font-semibold mb-4">Project Information</h4>
             <ul class="text-gray-700 text-sm space-y-2">
-              <li><strong>Category:</strong> {{ portfolioItem.categoryName }}</li>
-              <li><strong>Client:</strong> {{ portfolioItem.client }}</li>
-              <li><strong>Project date:</strong> {{ portfolioItem.date }}</li>
-              <li>
-                <strong>Project URL:</strong>
-                <a
-                  :href="portfolioItem.url"
-                  target="_blank"
-                  rel="noopener"
-                  class="text-teal-500 underline hover:text-teal-600"
-                >
-                  {{ portfolioItem.url }}
-                </a>
-              </li>
-            </ul>
-          </div>
+               <li><strong>Category:</strong> {{ portfolioItem.categoryName }}</li>
+               <li><strong>Client:</strong> {{ portfolioItem.client }}</li>
+               <li><strong>Project date:</strong> {{ portfolioItem.date }}</li>
+            <li>
+            <strong>Project URL:</strong>
+      <template v-if="portfolioItem.url">
+        <a
+          :href="portfolioItem.url"
+          target="_blank"
+          rel="noopener"
+          class="text-teal-500 underline hover:text-teal-600"
+        >
+          {{ portfolioItem.url }}
+        </a>
+      </template>
+    </li>
+  </ul>
+</div>
+
 
           <!-- Description -->
           <div>
@@ -85,153 +164,6 @@
     </div>
   </div>
 </template>
-
-
-<script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { computed } from 'vue'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Autoplay, Pagination } from 'swiper/modules'
-
-import 'swiper/css'
-import 'swiper/css/pagination'
-
-const route = useRoute()
-
-const portfolioItems = [
-  {
-    slug: 'app-1',
-    images: [
-      '/images/masonry-portfolio-1.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'App design',
-    client: 'ASU Company',
-    date: '01 March, 2020',
-    url: 'https://www.example.com',
-    description: 'Description of App 1',
-  },
-  {
-    slug: 'product-1',
-    images: [
-      '/images/masonry-portfolio-2.jpg',
-      '/images/product-1.jpg',
-      '/images/branding-1.jpg',
-      '/images/books-1.jpg',
-    ],
-    categoryName: 'Web design',
-    client: 'ASU Company',
-    date: '01 March, 2020',
-    url: 'https://www.example.com',
-    description:
-      'This is a multi-image slider. Images switch automatically every 3 seconds.',
-  },
-  {
-    slug: 'branding-1',
-    images: [
-      '/images/masonry-portfolio-3.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'Brand Identity',
-    client: 'XYZ Corp',
-    date: '15 April, 2021',
-    url: 'https://www.branding.com',
-    description: 'Brand identity design for XYZ Corp.',
-  },
-  {
-    slug: 'branding-2',
-    images: [
-      '/images/masonry-portfolio-6.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'Brand Identity',
-    client: 'XYZ Corp',
-    date: '20 June, 2021',
-    url: 'https://www.branding2.com',
-    description: 'Description of Branding 2',
-  },
-  {
-    slug: 'product-2',
-    images: [
-      '/images/masonry-portfolio-5.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'Product Design',
-    client: 'ASU Company',
-    date: '10 July, 2021',
-    url: 'https://www.product2.com',
-    description: 'Description of Product 2',
-  },
-  {
-    slug: 'app-2',
-    images: [
-      '/images/masonry-portfolio-4.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'App design',
-    client: 'ASU Company',
-    date: '05 Aug, 2021',
-    url: 'https://www.app2.com',
-    description: 'Description of App 2',
-  },
-  {
-    slug: 'branding-3',
-    images: [
-      '/images/masonry-portfolio-7.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'Brand Identity',
-    client: 'XYZ Corp',
-    date: '01 Sept, 2021',
-    url: 'https://www.branding3.com',
-    description: 'Description of Branding 3',
-  },
-  {
-    slug: 'app-3',
-    images: [
-      '/images/masonry-portfolio-8.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'App design',
-    client: 'ASU Company',
-    date: '15 Oct, 2021',
-    url: 'https://www.app3.com',
-    description: 'Description of App 3',
-  },
-  {
-    slug: 'product-3',
-    images: [
-      '/images/masonry-portfolio-9.jpg',
-      '/images/app-1.jpg',
-      '/images/books-1.jpg',
-      '/images/branding-1.jpg',
-    ],
-    categoryName: 'Product Design',
-    client: 'ASU Company',
-    date: '20 Nov, 2021',
-    url: 'https://www.product3.com',
-    description: 'Description of Product 3',
-  },
-]
-
-const portfolioItem = computed(() =>
-  portfolioItems.find((item) => item.slug === route.params.slug)
-)
-</script>
 
 <style scoped>
 .portfolio-pagination .swiper-pagination-bullet {

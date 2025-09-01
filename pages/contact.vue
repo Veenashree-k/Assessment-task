@@ -1,3 +1,78 @@
+<script setup lang="ts">
+import { reactive, ref, onMounted } from 'vue'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+// import { $fetch } from 'ofetch'
+import { serviceCall } from '~/utils/serviceCall'
+import { apiEndpoints } from '~/utils/apiEndpoints'
+
+onMounted(() => {
+  AOS.init({ duration: 800, once: true })
+})
+
+const form = reactive({
+  name: '',
+  email: '',
+  subject: '',
+  message: ''
+})
+
+const isSubmitting = ref(false)
+const successMessage = ref('')
+const errorMessage = ref('')
+
+interface ContactFormResponse {
+    message?: string 
+}
+
+const handleSubmit = async () => {
+  successMessage.value = ''
+  errorMessage.value = ''
+
+  if (!form.name || !form.email || !form.subject || !form.message) {
+    errorMessage.value = 'Please fill in all fields.'
+    return
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.email)) {
+    errorMessage.value = 'Please enter a valid email address.'
+    return
+  }
+
+  isSubmitting.value = true
+
+  try {
+    // Send POST request on submit
+    const response = await serviceCall<ContactFormResponse>({
+        endpoint: apiEndpoints.data.contactForm.endpoint,
+      method: 'POST',
+      body: {
+        name: form.name,
+        email: form.email,
+        subject: form.subject,
+        message: form.message
+      },
+    })
+
+    successMessage.value = response.message || 'Your message has been sent successfully!'
+    form.name = ''
+    form.email = ''
+    form.subject = ''
+    form.message = ''
+  } catch (error: unknown) {
+    console.error('Contact form submission error:', error)
+    if (typeof error === 'object' && error !== null && 'data' in error) {
+        errorMessage.value = (error as any).data?.title || 'An error occurred while sending your message.'
+    } else {
+        errorMessage.value = 'Something went wrong. Please try again later.'
+    }
+  } finally {
+    isSubmitting.value = false
+  }
+}
+</script>
+
 <template>
   <section id="contact" class="bg-gray-100 py-16" data-aos="fade-down">
     <div class="max-w-7xl mx-auto px-4">
@@ -77,16 +152,15 @@
         </div>
 
         <!-- Right Container: Contact Form -->
-        <div class="bg-white p-8 rounded-lg shadow-md">
+       <div class="bg-white p-8 rounded-lg shadow-md">
           <form @submit.prevent="handleSubmit" class="space-y-6" data-aos="zoom-in" novalidate>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label for="name" class="block mb-2 text-xs">Your Name</label>
                 <input
                   id="name"
-                  name="name"
-                  type="text"
                   v-model="form.name"
+                  type="text"
                   required
                   class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-teal-500"
                 />
@@ -95,44 +169,37 @@
                 <label for="email" class="block mb-2 text-xs">Your Email</label>
                 <input
                   id="email"
-                  name="email"
-                  type="email"
                   v-model="form.email"
+                  type="email"
                   required
                   class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-teal-500"
                 />
               </div>
             </div>
             <div>
-              <label for="subject" class="block mb-2 text-xs ">Subject</label>
+              <label for="subject" class="block mb-2 text-xs">Subject</label>
               <input
                 id="subject"
-                name="subject"
-                type="text"
                 v-model="form.subject"
+                type="text"
                 required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-teal-500"
               />
             </div>
             <div>
-              <label for="message" class="block mb-2 text-xs ">Message</label>
+              <label for="message" class="block mb-2 text-xs">Message</label>
               <textarea
                 id="message"
-                name="message"
-                rows="5"
                 v-model="form.message"
+                rows="5"
                 required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-teal-500"
               ></textarea>
             </div>
             <div class="text-center">
-              <button
-                type="submit"
-                :disabled="isSubmitting"
-                class="bg-teal-500 text-white px-5 py-3.5 rounded-full hover:bg-teal-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ isSubmitting ? 'Sending...' : 'Send Message' }}
-              </button>
+              <AppButton type="submit" :loading="isSubmitting" loading-text="Sending...">
+                Send Message
+              </AppButton>
             </div>
             <p v-if="successMessage" class="text-green-600 text-center mt-4">{{ successMessage }}</p>
             <p v-if="errorMessage" class="text-red-600 text-center mt-4">{{ errorMessage }}</p>
@@ -143,59 +210,3 @@
   </section>
 </template>
 
-<script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
-import AOS from 'aos'
-import 'aos/dist/aos.css'
-
-onMounted(() => {
-  AOS.init({ duration: 800, once: true })
-})
-
-const form = reactive({
-  name: '',
-  email: '',
-  subject: '',
-  message: ''
-})
-
-const isSubmitting = ref(false)
-const successMessage = ref('')
-const errorMessage = ref('')
-
-const handleSubmit = async () => {
-  successMessage.value = ''
-  errorMessage.value = ''
-
-  if (!form.name || !form.email || !form.subject || !form.message) {
-    errorMessage.value = 'Please fill in all fields.'
-    return
-  }
-
-  // Basic email regex check
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(form.email)) {
-    errorMessage.value = 'Please enter a valid email address.'
-    return
-  }
-
-  isSubmitting.value = true
-
-  try {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
-
-    // Reset form
-    form.name = ''
-    form.email = ''
-    form.subject = ''
-    form.message = ''
-
-    successMessage.value = 'Your message has been sent successfully!'
-  } catch (error) {
-    errorMessage.value = 'An error occurred while sending your message.'
-  } finally {
-    isSubmitting.value = false
-  }
-}
-</script>

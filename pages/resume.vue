@@ -1,3 +1,67 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { serviceCall } from '~/utils/serviceCall'
+import { apiEndpoints } from '~/utils/apiEndpoints'
+import LoadingBlock from '~/components/LoadingBlock.vue'
+
+// Interfaces
+interface ResumeItem {
+  id: number
+  sectionTitle: string
+  orderNumber: number
+  title: string
+  organization: string
+  startDate: string | null
+  endDate: string | null
+  description: string
+  isDeleted: boolean
+}
+
+// Refs
+const loading = ref(true)
+const summary = ref<ResumeItem | null>(null)
+const education = ref<ResumeItem[]>([])
+const experience = ref<ResumeItem[]>([])
+
+// Format functions
+const formatDate = (date: string | null) => {
+  if (!date) return 'Present'
+  const d = new Date(date)
+  return d.getFullYear().toString()
+}
+
+const splitDescription = (text: string) => {
+  return text
+    .split(/\\n|•/g)
+    .map(line => line.trim())
+    .filter(Boolean)
+}
+
+// Lifecycle
+onMounted(async () => {
+  try {
+    const data = await serviceCall<ResumeItem[]>({
+        endpoint: apiEndpoints.data.resume.endpoint,
+        method: apiEndpoints.data.resume.method
+    })
+
+    summary.value = data.find(item => item.sectionTitle === 'Summary') || null
+    education.value = data
+      .filter(item => item.sectionTitle === 'Education')
+      .sort((a, b) => a.orderNumber - b.orderNumber)
+
+    experience.value = data
+      .filter(item => item.sectionTitle === 'Professional Experience')
+      .sort((a, b) => a.orderNumber - b.orderNumber)
+
+  } catch (err) {
+    console.error('Resume API error:', err)
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
 <template>
   <section id="resume" class="py-16 bg-white text-gray-800" data-aos="fade-in">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,95 +74,61 @@
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-12">
-        <!-- Left Column -->
+      <!-- Loading -->
+      <div v-if="loading" class="text-center">Loading...</div>
+
+      <!-- Resume Content -->
+      <div v-else class="grid md:grid-cols-2 gap-12">
+        <!-- Summary & Education -->
         <div>
           <!-- Summary -->
           <h3 class="text-2xl font-semibold mb-6">Summary</h3>
-          <div class="relative pl-10 mb-10 space-y-3">
-            <!-- Vertical line -->
+          <div v-if="summary" class="relative pl-10 mb-10 space-y-3">
             <div class="absolute left-2.5 top-0 bottom-0 w-0.5 bg-teal-500"></div>
-            
-            <!-- Dot -->
             <div class="absolute -top-3 left-0.5 w-4 h-4 rounded-full border-2 border-teal-500 bg-white z-10"></div>
-
-            <h4 class="text-xl text-gray-600 font-medium">BRANDON JOHNSON</h4>
-            <p class="italic text-xs mb-2">
-              Innovative and deadline-driven Graphic Designer with 3+ years of experience designing and developing user-centered digital/print marketing material from initial concept to final, polished deliverable.
-            </p>
-            <ul class="text-xs list-disc list-inside text-gray-800 space-y-2">
-              <li>Portland par 127, Orlando, FL</li>
-              <li>(123) 456-7891</li>
-              <li>alice.barkley@example.com</li>
-            </ul>
+            <h4 class="text-xl text-gray-600 font-medium">{{ summary.title }}</h4>
+            <p class="italic text-xs mb-2">{{ summary.organization }}</p>
+            <p class="text-xs text-gray-800">{{ summary.description }}</p>
           </div>
-          
 
           <!-- Education -->
           <h3 class="text-2xl font-semibold mb-6">Education</h3>
-
           <div class="space-y-12">
-            <!-- Education Block 1 -->
-            <div class="relative pl-10 space-y-3 mb-8">
+            <div
+              v-for="edu in education"
+              :key="edu.id"
+              class="relative pl-10 space-y-3 mb-8"
+            >
               <div class="absolute left-1 top-0 h-full border-l-2 border-teal-500"></div>
               <div class="absolute -top-3 -left-0.5 w-4 h-4 rounded-full border-2 border-teal-500 bg-white z-10"></div>
-
-              <h4 class="text-lg text-gray-600 font-medium">MASTER OF FINE ARTS & GRAPHIC DESIGN</h4>
-              <p class="text-xs text-black font-semibold">2015 - 2016</p>
-              <p class="italic text-xs mb-1">Rochester Institute of Technology, Rochester, NY</p>
-              <p class="text-xs text-gray-800">
-                Qui deserunt veniam. Et sed aliquam labore tempore sed quisquam iusto autem sit. Ea vero voluptatum qui ut dignissimos deleniti.
+              <h4 class="text-lg text-gray-600 font-medium">{{ edu.title }}</h4>
+              <p class="text-xs text-black font-semibold">
+                {{ formatDate(edu.startDate) }} - {{ formatDate(edu.endDate) }}
               </p>
-            </div>
-
-            <!-- Education Block 2 -->
-            <div class="relative pl-10 space-y-3 mb-8">
-              <div class="absolute left-1 top-0 h-full border-l-2 border-teal-500"></div>
-              <div class="absolute -top-3 -left-0.5 w-4 h-4 rounded-full border-2 border-teal-500 bg-white z-10"></div>
-
-              <h4 class="text-lg text-gray-600 font-medium">BACHELOR OF FINE ARTS & GRAPHIC DESIGN</h4>
-              <p class="text-xs text-black font-semibold">2010 - 2014</p>
-              <p class="italic text-xs mb-1">Rochester Institute of Technology, Rochester, NY</p>
-              <p class="text-xs text-gray-700">
-                Quia nobis sequi est occaecati aut. Repudiandae et iusto quae reiciendis et quis. Eius vel ratione eius unde vitae rerum.
-              </p>
+              <p class="italic text-xs mb-1">{{ edu.organization }}</p>
+              <p class="text-xs text-gray-800">{{ edu.description }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Right Column -->
+        <!-- Professional Experience -->
         <div>
           <h3 class="text-2xl font-semibold mb-6">Professional Experience</h3>
           <div class="space-y-12">
-            <!-- Experience Block 1 -->
-            <div class="relative pl-10 space-y-3 mb-8">
+            <div
+              v-for="exp in experience"
+              :key="exp.id"
+              class="relative pl-10 space-y-3 mb-8"
+            >
               <div class="absolute left-1 top-0 h-full border-l-2 border-teal-500"></div>
               <div class="absolute -top-3 -left-0.5 w-4 h-4 rounded-full border-2 border-teal-500 bg-white z-10"></div>
-
-              <h4 class="text-lg text-gray-700 font-medium">SENIOR GRAPHIC DESIGN SPECIALIST</h4>
-              <p class="text-sm text-black font-semibold">2019 - Present</p>
-              <p class="italic text-xs mb-1">Experion, New York, NY</p>
+              <h4 class="text-lg text-gray-700 font-medium">{{ exp.title }}</h4>
+              <p class="text-sm text-black font-semibold">
+                {{ formatDate(exp.startDate) }} - {{ formatDate(exp.endDate) }}
+              </p>
+              <p class="italic text-xs mb-1">{{ exp.organization }}</p>
               <ul class="text-xs list-disc list-inside text-gray-800 space-y-2">
-                <li>Lead in the design, development, and implementation of the graphic, layout, and production communication materials</li>
-                <li>Delegate tasks to the 7 members of the design team and provide counsel on all aspects of the project.</li>
-                <li>Supervise the assessment of all graphic materials in order to ensure quality and accuracy of the design</li>
-                <li>Oversee the efficient use of production project budgets ranging from $2,000 - $25,000</li>
-              </ul>
-            </div>
-
-            <!-- Experience Block 2 -->
-            <div class="relative pl-10 space-y-3 mb-8">
-              <div class="absolute left-1 top-0 h-full border-l-2 border-teal-500"></div>
-              <div class="absolute -top-3 -left-0.5 w-4 h-4 rounded-full border-2 border-teal-500 bg-white z-10"></div>
-
-              <h4 class="text-lg text-gray-600 font-medium">GRAPHIC DESIGN SPECIALIST</h4>
-              <p class="text-xs text-black font-semibold">2017 - 2018</p>
-              <p class="italic text-xs mb-1">Stepping Stone Advertising, New York, NY</p>
-              <ul class="text-xs list-disc list-inside text-gray-800 space-y-2">
-                <li>Developed numerous marketing programs (logos, brochures,infographics, presentations, and advertisements).</li>
-                <li>Managed up to 5 projects or tasks at a given time while under pressure</li>
-                <li>Recommended and consulted with clients on the most appropriate graphic design</li>
-                <li>Created 4+ design presentations and proposals a month for clients and account managers</li>
+                <li v-for="(line, i) in splitDescription(exp.description)" :key="i">{{ line }}</li>
               </ul>
             </div>
           </div>
@@ -107,7 +137,3 @@
     </div>
   </section>
 </template>
-
-<script setup lang="ts">
-// no script logic needed here currently
-</script>

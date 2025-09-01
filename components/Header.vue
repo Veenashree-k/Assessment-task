@@ -1,9 +1,26 @@
+<script setup>
+import { ref } from 'vue'
+
+const navItems = [
+  { name: 'Home', to: '/' },
+  { name: 'About', to: '/about' },
+  { name: 'Resume', to: '/resume' },
+  { name: 'Services', to: '/services' },
+  { name: 'Portfolio', to: '/portfolio' }
+]
+
+const { data: pages } = await useFetch('https://localhost:7102/api/Data/pages')
+
+const mobileMenuOpen = ref(false)
+const mobileDropdownOpen = ref(false)
+</script>
+
 <template>
-  <header class="sticky top-0 bg-stone-200 shadow-md z-50">
-   <nav class="container mx-auto flex items-center justify-between py-4 px-4">
+  <header class="sticky top-0 bg-stone-200 shadow-md z-50 w-full">
+   <nav class="max-w-[1600px] w-full mx-auto flex items-center justify-between py-4 px-4">
   <!-- Left: Logo -->
   <div class="flex-shrink-0">
-    <h1 class="text-2xl font-Raleway text-black">
+    <h1 class="text-[32px] font-Raleway font-light text-[#222222]">
       <NuxtLink to="/">KELLY</NuxtLink>
     </h1>
   </div>
@@ -14,7 +31,7 @@
       <NuxtLink
         :to="item.to"
         class="relative pb-2 hover:text-teal-600 transition"
-        :class="$route.path === item.to ? 'text-teal-600 font-semibold' : ''"
+            :class="$route.path === item.to ? 'text-teal-600 font-thin' : ''"
       >
         {{ item.name }}
         <span
@@ -69,7 +86,7 @@
       <NuxtLink
         to="/contact"
         class="relative pb-2 hover:text-teal-600 transition"
-        :class="$route.path === '/contact' ? 'text-teal-600 font-semibold' : ''"
+        :class="$route.path === '/contact' ? 'text-teal-600 font-light' : ''"
       >
         Contact
         <span
@@ -162,21 +179,6 @@
     </transition>
   </header>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-
-const navItems = [
-  { name: 'Home', to: '/' },
-  { name: 'About', to: '/about' },
-  { name: 'Resume', to: '/resume' },
-  { name: 'Services', to: '/services' },
-  { name: 'Portfolio', to: '/portfolio' }
-]
-
-const mobileMenuOpen = ref(false)
-const mobileDropdownOpen = ref(false)
-</script>
 
 <style scoped>
 .fade-enter-active,
