@@ -15,7 +15,7 @@ export const serviceCall = async <T>({ endpoint, method, body }: ApiCallOptions)
   try {
     const response: T = await $fetch(url, {
       method,
-      body: method !== 'GET' ? body : undefined,
+      ...(method !== 'GET' && body ? { body } : {}),
       headers: {
         'Content-Type': 'application/json',
       },
